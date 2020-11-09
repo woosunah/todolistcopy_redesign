@@ -5,7 +5,7 @@
     <div>
       <p class="today-title">
         You've got <br />
-        <span>{{ '3' }}</span> <br />
+        <span>{{ todos.length }}</span> <br />
         tasks today !
       </p>
     </div>
@@ -41,10 +41,13 @@ export default {
   data() {
     return {
       today: moment().format('MM/DD  ddd'),
+      // data, computed, watch - property  // class = export default {사이에 있는것들}
+      newTitle: '',
     };
   },
   methods: {
     addTask() {
+      // console.log(this.newTitle, this.newId);
       this.$store.commit('addTask', {
         id: this.newId,
         complete: false,
@@ -71,7 +74,7 @@ export default {
   width: 50%;
   height: 350px;
   padding: 20px;
-  margin: 100px auto 0;
+  margin: 50px auto 0;
   position: relative;
   background-color: -webkit-linear-gradient(
     to right,
