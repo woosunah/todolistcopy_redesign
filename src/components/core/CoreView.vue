@@ -1,10 +1,21 @@
 <template>
   <div class="view">
+    <v-row class="todo-tap-bar" justify="end" no-gutters>
+      <v-fade transition>
+        <button
+          v-bind:key="isEditing"
+          @click="hideTask(task)"
+          class="mb-5 hide-btn"
+        >
+          {{ isHideComplete ? ' Hide Complete' : '  Show Complete' }}
+        </button>
+      </v-fade>
+    </v-row>
     <div class="todo-list">
       <v-row
         align="center"
         class="list-item"
-        v-for="(todo, i) in todos"
+        v-for="(todo, i) in filteredTodos"
         :key="i"
         no-gutters
       >
@@ -34,9 +45,22 @@
 <script>
 import { mapState } from 'vuex';
 export default {
+  data() {
+    return {
+      isHideComplete: false,
+    };
+  },
   computed: {
     ...mapState(['todos']),
+    filteredTodos() {
+      if (this.isHideComplete) {
+        return this.todos.filter((el) => !el.complete);
+      } else {
+        return this.todos;
+      }
+    },
   },
+
   methods: {
     editTask(task) {
       task.complete = !task.complete;
@@ -44,6 +68,9 @@ export default {
     },
     deleteTask(task) {
       this.$store.commit('deleteTask', task);
+    },
+    hideTask() {
+      this.isHideComplete = !this.isHideComplete;
     },
   },
 };
@@ -54,9 +81,9 @@ export default {
   width: 50%;
   margin: 0 auto;
   background-color: rgba(239, 239, 239);
+  padding: 30px;
 }
 .todo-list {
-  padding: 30px;
   p {
     margin: 0;
     // font-weight: bold;
@@ -67,7 +94,7 @@ export default {
   }
 }
 .list-item:first-child {
-  margin-top: 30px;
+  margin-top: 0;
 }
 .list-item {
   // border: 1px solid red;
@@ -86,5 +113,12 @@ export default {
   position: absolute;
   top: -8px;
   left: -6px;
+}
+
+.hide-btn {
+  padding: 0;
+  font-family: sans-serif;
+  font-weight: 500;
+  color: #666;
 }
 </style>

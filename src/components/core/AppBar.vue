@@ -5,7 +5,7 @@
     <div>
       <p class="today-title">
         You've got <br />
-        <span>{{ todos.length }}</span> <br />
+        <span>{{ activeTask.length }}</span> <br />
         tasks today !
       </p>
     </div>
@@ -45,6 +45,19 @@ export default {
       newTitle: '',
     };
   },
+  computed: {
+    ...mapState(['todos']),
+    newId() {
+      return (
+        this.todos.reduce((acc, cur) => {
+          return Math.max(acc, cur.id);
+        }, 0) + 1
+      );
+    },
+    activeTask() {
+      return this.todos.filter((todo) => !todo.complete);
+    },
+  },
   methods: {
     addTask() {
       // console.log(this.newTitle, this.newId);
@@ -54,16 +67,6 @@ export default {
         title: this.newTitle,
       });
       this.newTitle = '';
-    },
-  },
-  computed: {
-    ...mapState(['todos']),
-    newId() {
-      return (
-        this.todos.reduce((acc, cur) => {
-          return Math.max(acc, cur.id);
-        }, 0) + 1
-      );
     },
   },
 };
