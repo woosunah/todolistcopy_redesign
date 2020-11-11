@@ -1,43 +1,47 @@
 <template>
   <div class="view">
     <v-row class="todo-tap-bar" justify="end" no-gutters>
-      <v-fade transition>
+      <v-fade-transition mode="out-in">
         <button
-          v-bind:key="isEditing"
-          @click="hideTask(task)"
+          v-bind:key="isHideComplete"
+          @click="hideTask"
           class="mb-5 hide-btn"
         >
           {{ isHideComplete ? ' Hide Complete' : '  Show Complete' }}
         </button>
-      </v-fade>
+      </v-fade-transition>
     </v-row>
+
     <div class="todo-list">
-      <v-row
-        align="center"
-        class="list-item"
-        v-for="(todo, i) in filteredTodos"
-        :key="i"
-        no-gutters
-      >
+      <transition-group name="list-slide">
         <div
-          class="check-box-border"
-          @click="editTask(todo)"
-          style="border: 1px solid #86a8e7"
+          ref="listItem"
+          class="list-slide-item"
+          v-for="(todo, i) in filteredTodos"
+          :key="todo.id"
         >
-          <v-btn icon color="#86a8e7" class="check"
-            ><v-icon v-show="todo.complete">mdi-check</v-icon></v-btn
-          >
+          <v-row align="center" class="list-item" no-gutters>
+            <div
+              class="check-box-border"
+              @click="editTask(todo)"
+              style="border: 1px solid #86a8e7"
+            >
+              <v-btn icon color="#86a8e7" class="check"
+                ><v-icon v-show="todo.complete">mdi-check</v-icon></v-btn
+              >
+            </div>
+            <p :class="{ 'text-complete': todo.complete }" :key="i">
+              <!-- :class (클래스 바인딩)todo.complete이 true인지, false인지에 따라서 true일때, 'text-complete'가 나오게 하려고 -->
+              {{ todo.title }}
+              <!-- store에 배열안에 객체.문자열을 가져올때 {{}}해주는것 -->
+            </p>
+            <v-spacer></v-spacer>
+            <v-btn icon @click="deleteTask(todo)">
+              <v-icon small>mdi-close</v-icon>
+            </v-btn>
+          </v-row>
         </div>
-        <p :class="{ 'text-complete': todo.complete }">
-          <!-- :class (클래스 바인딩)todo.complete이 true인지, false인지에 따라서 true일때, 'text-complete'가 나오게 하려고 -->
-          {{ todo.title }}
-          <!-- store에 배열안에 객체.문자열을 가져올때 {{}}해주는것 -->
-        </p>
-        <v-spacer></v-spacer>
-        <v-btn icon @click="deleteTask(todo)">
-          <v-icon small>mdi-close</v-icon>
-        </v-btn>
-      </v-row>
+      </transition-group>
     </div>
   </div>
 </template>
@@ -60,7 +64,19 @@ export default {
       }
     },
   },
-
+  mounted() {
+    function addStyle(styleString) {
+      const style = document.createElement('style');
+      style.textContent = styleString;
+      document.head.append(style);
+    }
+    let listItemWidth = this.$refs.listItem[0].clientWidth;
+    console.log(listItemWidth);
+    addStyle(`.list-slide-leave-active {
+                        position: absolute;
+                        width: ${listItemWidth}px;
+                      }`);
+  },
   methods: {
     editTask(task) {
       task.complete = !task.complete;
@@ -77,6 +93,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.list-slide-item {
+  transition: all 0.5s;
+  margin-top: 20px;
+}
+
+.list-slide-enter,
+.list-slide-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.list-item {
+  background-color: #fff;
+  height: 50px;
+}
 .view {
   width: 50%;
   margin: 0 auto;
@@ -84,6 +115,7 @@ export default {
   padding: 30px;
 }
 .todo-list {
+  min-height: 100px;
   p {
     margin: 0;
     // font-weight: bold;
@@ -96,12 +128,7 @@ export default {
 .list-item:first-child {
   margin-top: 0;
 }
-.list-item {
-  // border: 1px solid red;
-  background-color: #fff;
-  margin-top: 20px;
-  height: 50px;
-}
+
 .check-box-border {
   width: 24px;
   height: 24px;
