@@ -1,6 +1,6 @@
 <template>
   <v-row class="footer" justify="center" align="center">
-    <p>Copyrgiht &copy; Made by WOO SUN AH 💙</p>
+    <p>Copyright &copy; Made by WOO SUN AH 💙</p>
   </v-row>
 </template>
 
